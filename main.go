@@ -28,7 +28,7 @@ type entryType struct {
 const (
 	onePasswordItemId = "z35jsmkboau56wxn3ftgqpi66y"
 	period            = 365 * 20 // number of days to show
-	smoothInterval    = 365 * 1  // number of days before date index to average over
+	lookBackInterval  = 365 * 1  // number of days before date index to average over
 )
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 
 	now := time.Now()
 	to := now
-	from := now.Add(-time.Duration((period + smoothInterval) * time.Hour * 24))
+	from := now.Add(-time.Duration((period + lookBackInterval) * time.Hour * 24))
 
 	symbols := []string{"dia", "spy", "vt"}
 
@@ -81,8 +81,8 @@ func processEntries(inEntries []entryType) []entryType {
 	var outEntries []entryType
 
 	for index := range inEntries {
-		if index >= smoothInterval {
-			avgRate := (inEntries[index].Close - average(inEntries[index-smoothInterval:index])) / inEntries[index].Close
+		if index >= lookBackInterval {
+			avgRate := (inEntries[index].Close - average(inEntries[index-lookBackInterval:index])) / inEntries[index].Close
 
 			outEntries = append(outEntries, entryType{
 				AvgRate: avgRate,
@@ -136,7 +136,7 @@ func (t CustomRateTicker) Ticks(min, max float64) []plot.Tick {
 
 func prepPlot(p *plot.Plot) {
 	p.Add(plotter.NewGrid())
-	p.Title.Text = fmt.Sprintf("Rate of Change (Normalized): Price VERSUS Prior %d Day(s) Average Price", smoothInterval)
+	p.Title.Text = fmt.Sprintf("Normalized Rate of Change Over Time: (Price - Prior %d Day(s) Average Price) / Price", lookBackInterval)
 
 	p.X.Tick.Marker = plot.TimeTicks{Format: "2006-01-02", Ticker: CustomTimeTicker{}}
 	p.Y.Tick.Marker = CustomRateTicker{}
