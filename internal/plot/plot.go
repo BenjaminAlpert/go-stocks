@@ -99,8 +99,8 @@ func savePlot(p *plot.Plot, outputPath string) error {
 	return nil
 }
 
-func writePlot(p *plot.Plot, outputPath string) (io.WriterTo, error) {
-	writer, err := p.WriterTo(11*vg.Inch, 8*vg.Inch, "svg")
+func writePlot(p *plot.Plot, outputformat string) (io.WriterTo, error) {
+	writer, err := p.WriterTo(11*vg.Inch, 8*vg.Inch, outputformat)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create io.WriterTo object for the svg plot, %s", err)
 	}

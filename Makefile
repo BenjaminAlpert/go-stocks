@@ -1,25 +1,38 @@
-build-dev:
+dev-build:
 	go build -o ./bin/go-stocks
 
-run-dev:
+dev-run:
 	TIINGO_TOKEN="op://k8s/Tiingo/token" op run -- ./bin/go-stocks
 
-build-and-run-dev: build-dev run-dev
+dev-build-and-run: dev-build dev-run
 
 REGISTRY_HOST=registry.a0-0.com
-REGISTRY_PATH=/go-stocks
-REGISTRY_TAG=latest
+REGISTRY_IMAGE_PATH=/go-stocks
+REGISTRY_IMAGE_TAG=latest
 
+REGISTRY_HELM_CHART_PATH=/charts/go-stocks
+REGISTRY_HELM_CHART_TAG:=$(shell yq '.version' ./helm/chart/Chart.yaml)
 
-build:
-	docker build -t ${REGISTRY_HOST}${REGISTRY_PATH}:${REGISTRY_TAG} . --platform=linux/amd64
+image-build:
+	docker build -t ${REGISTRY_HOST}${REGISTRY_IMAGE_PATH}:${REGISTRY_IMAGE_TAG} . --platform=linux/amd64
 
-push:
-	docker push ${REGISTRY_HOST}${REGISTRY_PATH}:${REGISTRY_TAG}
+image-push:
+	docker push ${REGISTRY_HOST}${REGISTRY_IMAGE_PATH}:${REGISTRY_IMAGE_TAG}
 
-build-and-push: build push
+helm-push:
+	helm package ./helm/chart
+	helm push "go-stocks-${REGISTRY_HELM_CHART_TAG}.tgz" oci://${REGISTRY_HOST}${REGISTRY_HELM_CHART_PATH}
+	rm "go-stocks-${REGISTRY_HELM_CHART_TAG}.tgz"
 
-build-and-push-and-redeploy: build-and-push
+redeploy:
 	kubectl delete pods -n go-stocks -l app=go-stocks
 	kubectl wait pods -n go-stocks -l app=go-stocks --for='jsonpath={.status.conditions[?(@.type=="Ready")].status}=True'
 	kubectl logs -n go-stocks -l app=go-stocks
+
+build: image-build
+
+push: image-push helm-push
+
+build-and-push: build push
+
+build-and-push-and-redeploy: build-and-push redeploy

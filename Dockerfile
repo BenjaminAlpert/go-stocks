@@ -1,13 +1,16 @@
-FROM golang:1.23
+FROM --platform=linux/amd64 golang:1.23 AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY . .
+
 RUN go mod download
 
-COPY *.go ./
-
 RUN CGO_ENABLED=0 GOOS=linux go build -o /stocks
+
+FROM builder
+
+COPY --from=builder /stocks /stocks
 
 EXPOSE 8080
 

@@ -12,7 +12,7 @@ import (
 const (
 	period           = 365 * 20 // number of days to show
 	lookBackInterval = 365 * 1  // number of days before date index to average over
-	cacheTimeout     = time.Minute
+	cacheTimeout     = time.Hour * 4
 )
 
 var (
