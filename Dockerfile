@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 golang:1.23 AS builder
+FROM golang:1.23 AS builder
 
 WORKDIR /app
 
