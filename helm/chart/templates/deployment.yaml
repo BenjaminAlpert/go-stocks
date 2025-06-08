@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: go-stocks
+  name: go-stocks
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: go-stocks
+  template:
+    metadata:
+      labels:
+        app: go-stocks
+    spec:
+      containers:
+      - name: go-stocks
+        image: "{{ $.Values.image }}"
+        imagePullPolicy: Always
+        ports:
+          - name: go-stocks
+            containerPort: 8080
+            protocol: TCP
+        env:
+          - name: TIINGO_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: tingo-token
+                key: token
+        resources:
+          requests:
+            cpu: 10m
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          failureThreshold: 3
+          timeoutSeconds: 1
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          failureThreshold: 3
+          timeoutSeconds: 1
+          periodSeconds: 10
+        startupProbe:
+          tcpSocket:
+            port: 8080
+          failureThreshold: 30
+          timeoutSeconds: 1
+          periodSeconds: 5
+      restartPolicy: Always
