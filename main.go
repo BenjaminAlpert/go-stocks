@@ -27,8 +27,8 @@ type entryType struct {
 
 const (
 	onePasswordItemId = "z35jsmkboau56wxn3ftgqpi66y"
-	period            = 365 * 5 // number of days to show
-	smoothInterval    = 365 * 1 // number of days before date index to average over
+	period            = 365 * 20 // number of days to show
+	smoothInterval    = 365 * 1  // number of days before date index to average over
 )
 
 func main() {
