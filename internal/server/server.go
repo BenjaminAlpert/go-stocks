@@ -23,7 +23,6 @@ func New() {
 			w.Header().Set("Content-Type", "text/plain")
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprintf(w, "plotting error: %s", plotErr)
-			fmt.Printf("[ERROR] plotting error: %s\n", plotErr)
 		} else {
 			w.Header().Set("Content-Type", "image/svg+xml")
 			w.WriteHeader(http.StatusOK)

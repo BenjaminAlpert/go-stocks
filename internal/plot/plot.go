@@ -21,12 +21,12 @@ func New(symbols []string, from time.Time, to time.Time, lookBackInterval int) (
 
 	var lines []plotter.Line
 	for _, symbol := range symbols {
-		fmt.Printf("INFO: Getting %s data from tiingo\n", symbol)
+		fmt.Printf("[INFO] Getting %s data from tiingo\n", symbol)
 		entries, err := data.GetEnties(symbol, from, to, lookBackInterval)
 		if err != nil {
 			return nil, err
 		}
-		fmt.Printf("INFO: Done getting %s data from tiingo\n", symbol)
+		fmt.Printf("[INFO] Done getting %s data from tiingo\n", symbol)
 
 		line, err := makeLine(entries)
 		if err != nil {
@@ -57,7 +57,6 @@ func New(symbols []string, from time.Time, to time.Time, lookBackInterval int) (
 func prepPlot(p *plot.Plot, lookBackInterval int) {
 	p.Add(plotter.NewGrid())
 	p.Title.Text = fmt.Sprintf("Normalized Rate of Change Over Time: (Price - Prior %d Day(s) Average Price) / Price", lookBackInterval)
-
 	p.X.Tick.Marker = plot.TimeTicks{Format: "2006-01-02", Ticker: CustomTimeTicker{}}
 	p.Y.Tick.Marker = CustomRateTicker{}
 	p.X.Tick.Label.Rotation = math.Pi / 4
@@ -92,7 +91,7 @@ func doPlot(p *plot.Plot, symbols []string, lines *[]plotter.Line) error {
 }
 
 func savePlot(p *plot.Plot, outputPath string) error {
-	err := p.Save(22*vg.Inch, 8*vg.Inch, outputPath)
+	err := p.Save(11*vg.Inch, 8*vg.Inch, outputPath)
 	if err != nil {
 		return fmt.Errorf("unable to save plot to image file (%s), %s", outputPath, err)
 	}
@@ -102,7 +101,7 @@ func savePlot(p *plot.Plot, outputPath string) error {
 func writePlot(p *plot.Plot, outputformat string) (io.WriterTo, error) {
 	writer, err := p.WriterTo(11*vg.Inch, 8*vg.Inch, outputformat)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create io.WriterTo object for the svg plot, %s", err)
+		return nil, fmt.Errorf("unable to create io.WriterTo object for the %s plot, %s", outputformat, err)
 	}
 	return writer, nil
 }

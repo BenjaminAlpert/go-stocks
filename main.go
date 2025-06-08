@@ -45,18 +45,22 @@ func main() {
 }
 
 func generateNewPlotAndUpdateServer(symbols []string) {
-	fmt.Println("INFO: Updating")
+	fmt.Println("[INFO] Updating")
 
 	to := time.Now()
 	from := to.Add(-time.Duration((period + lookBackInterval) * time.Hour * 24))
 
-	fmt.Println("INFO: Generating updated plot")
+	fmt.Println("[INFO] Generating updated plot")
 	plotWriter, err := plot.New(symbols, from, to, lookBackInterval)
-	fmt.Println("INFO: Done generating updated plot")
+	if err != nil {
+		fmt.Printf("[ERROR] failed to generate a updated plot, %s\n", err)
+	}
+	fmt.Println("[INFO] Done generating updated plot")
 
-	fmt.Println("INFO: Updating server with new plot")
+	fmt.Println("[INFO] Updating server with new plot")
 	server.UpdateWriter(plotWriter, err)
-	fmt.Println("INFO: Done updating server with new plot")
+	fmt.Println("[INFO] Done updating server with new plot")
 
-	fmt.Println("INFO: Done updating\nWaiting for next update...")
+	fmt.Println("[INFO] Done updating")
+	fmt.Println("[INFO] Waiting for next update...")
 }
