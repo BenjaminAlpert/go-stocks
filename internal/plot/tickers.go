@@ -16,14 +16,9 @@ func (t CustomTimeTicker) Ticks(min, max float64) []plot.Tick {
 	end := time.Unix(int64(max), 0)
 
 	for start.Before(end) {
-		//numYears := end.Sub(start).Hours() / 24 / 365
 		value := float64(start.Unix())
 		ticks = append(ticks, plot.Tick{Value: value, Label: fmt.Sprintf("%f", value)})
-		// if numYears <= 1 {
-		// 	start = start.AddDate(0, 2, 0)
-		// } else {
 		start = start.AddDate(1, 0, 0)
-		//}
 	}
 	ticks = append(ticks, plot.Tick{Value: max, Label: fmt.Sprintf("%f", max)})
 	return ticks

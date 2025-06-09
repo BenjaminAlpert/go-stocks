@@ -14,15 +14,15 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 )
 
-func New(symbols []string, from time.Time, to time.Time, lookBackInterval int) (io.WriterTo, error) {
+func New(symbols []string, from time.Time, to time.Time, interval int) (io.WriterTo, error) {
 	p := plot.New()
 
-	prepPlot(p, lookBackInterval)
+	prepPlot(p, interval)
 
 	var lines []plotter.Line
 	for _, symbol := range symbols {
 		fmt.Printf("[INFO] Getting %s data from tiingo\n", symbol)
-		entries, err := data.GetEnties(symbol, from, to, lookBackInterval)
+		entries, err := data.GetEnties(symbol, from, to, interval)
 		if err != nil {
 			return nil, err
 		}
@@ -54,9 +54,9 @@ func New(symbols []string, from time.Time, to time.Time, lookBackInterval int) (
 	return writer, nil
 }
 
-func prepPlot(p *plot.Plot, lookBackInterval int) {
+func prepPlot(p *plot.Plot, interval int) {
 	p.Add(plotter.NewGrid())
-	p.Title.Text = fmt.Sprintf("Normalized Rate of Change Over Time: (Price - Prior %d Day(s) Average Price) / Price", lookBackInterval)
+	p.Title.Text = fmt.Sprintf("Normalized Rate of Change Over Time: (Price - Prior %d Day(s) Average Price) / Price", interval/365)
 	p.X.Tick.Marker = plot.TimeTicks{Format: "2006-01-02", Ticker: CustomTimeTicker{}}
 	p.Y.Tick.Marker = CustomRateTicker{}
 	p.X.Tick.Label.Rotation = math.Pi / 4

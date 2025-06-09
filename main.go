@@ -2,65 +2,49 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"time"
 
+	"github.com/BenjaminAlpert/go-stocks/internal/cmd"
 	"github.com/BenjaminAlpert/go-stocks/internal/plot"
 	"github.com/BenjaminAlpert/go-stocks/internal/server"
 )
 
-const (
-	period           = 365 * 20 // number of days to show
-	lookBackInterval = 365 * 1  // number of days before date index to average over
-	cacheTimeout     = time.Hour * 4
-)
-
-var (
-	Writer io.WriterTo
-)
-
 func main() {
+	err := cmd.New(func(period int, interval int, updateFrequency int, symbols []string) {
+		ticker := time.NewTicker(time.Duration(updateFrequency) * time.Hour)
 
-	symbols := []string{"dia", "spy", "vt"}
+		go func() {
+			for {
+				fmt.Println("[INFO] Updating")
 
-	ticker := time.NewTicker(cacheTimeout)
-	quit := make(chan struct{})
+				to := time.Now()
+				from := to.Add(-time.Duration((period*365+interval)*24) * time.Hour)
 
-	generateNewPlotAndUpdateServer(symbols)
+				fmt.Println("[INFO] Generating updated plot")
+				plotWriter, err := plot.New(symbols, from, to, interval)
+				if err != nil {
+					fmt.Printf("[ERROR] failed to generate a updated plot, %s\n", err)
+					<-ticker.C // Wait until ticker to update
+					continue
+				}
+				fmt.Println("[INFO] Done generating updated plot")
 
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				generateNewPlotAndUpdateServer(symbols)
-			case <-quit:
-				ticker.Stop()
-				return
+				fmt.Println("[INFO] Updating server with new plot")
+				server.UpdateWriter(plotWriter, err)
+				fmt.Println("[INFO] Done updating server with new plot")
+
+				fmt.Println("[INFO] Done updating")
+				fmt.Println("[INFO] Waiting for next update...")
+
+				<-ticker.C // Wait until ticker to update
 			}
-		}
-	}()
+		}()
 
-	server.New()
-	close(quit)
-}
+		server.New()
+		ticker.Stop()
+	})
 
-func generateNewPlotAndUpdateServer(symbols []string) {
-	fmt.Println("[INFO] Updating")
-
-	to := time.Now()
-	from := to.Add(-time.Duration((period + lookBackInterval) * time.Hour * 24))
-
-	fmt.Println("[INFO] Generating updated plot")
-	plotWriter, err := plot.New(symbols, from, to, lookBackInterval)
 	if err != nil {
-		fmt.Printf("[ERROR] failed to generate a updated plot, %s\n", err)
+		fmt.Printf("[ERROR] failed to parse command: %s\n", err)
 	}
-	fmt.Println("[INFO] Done generating updated plot")
-
-	fmt.Println("[INFO] Updating server with new plot")
-	server.UpdateWriter(plotWriter, err)
-	fmt.Println("[INFO] Done updating server with new plot")
-
-	fmt.Println("[INFO] Done updating")
-	fmt.Println("[INFO] Waiting for next update...")
 }
