@@ -5,8 +5,8 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink">
 <g transform="scale(1, -1) translate(0, -576)">
 <path d="M0,0L792,0L792,576L0,576Z" style="fill:#FFFFFF" />
-<text x="190.84" y="-566.61" transform="scale(1, -1)"
-	style="font-family:Liberation Serif;font-variant:normal;font-weight:normal;font-style:normal;font-size:12px">Normalized Rate of Change Over Time: (Price - Prior 1 Day(s) Average Price) / Price</text>
+<text x="184.84" y="-566.61" transform="scale(1, -1)"
+	style="font-family:Liberation Serif;font-variant:normal;font-weight:normal;font-style:normal;font-size:12px">Normalized Rate of Change Over Time: (Price - Prior 365 Day(s) Average Price) / Price</text>
 <g transform="rotate(45)">
 <text x="11.268" y="1.2116" transform="scale(1, -1)"
 	style="font-family:Liberation Serif;font-variant:normal;font-weight:normal;font-style:normal;font-size:10px">2005-11-21</text>
