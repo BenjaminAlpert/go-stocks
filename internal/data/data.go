@@ -107,7 +107,9 @@ func addAvgRateToEntries(inEntries []EntryType, lookBackInterval int) []EntryTyp
 
 	for index := range inEntries {
 		if index >= lookBackInterval {
-			avgRate := (inEntries[index].Close - average(inEntries[index-lookBackInterval:index])) / inEntries[index].Close
+			avg := average(inEntries[index-lookBackInterval : index])
+			avgRate := (average(inEntries[index-15:index]) - avg) / avg
+			// avgRate := (inEntries[index].Close - avg) / avg
 
 			outEntries = append(outEntries, EntryType{
 				Close:   inEntries[index].Close,

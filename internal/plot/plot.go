@@ -56,7 +56,8 @@ func New(symbols []string, from time.Time, to time.Time, interval int) (io.Write
 
 func prepPlot(p *plot.Plot, interval int) {
 	p.Add(plotter.NewGrid())
-	p.Title.Text = fmt.Sprintf("Normalized Rate of Change Over Time: (Price - Prior %d Day(s) Average Price) / Price", interval)
+	p.Title.Text = fmt.Sprintf("Normalized Rate of Change Over Time: (Prior 15 Day(s) Average Price) - (Prior %d Day(s) Average Price)) / (Prior %d Day(s) Average Price)", interval, interval)
+	//p.Title.Text = fmt.Sprintf("Normalized Rate of Change Over Time: (Price - (Prior %d Day(s) Average Price)) / (Prior %d Day(s) Average Price)", interval, interval)
 	p.X.Tick.Marker = plot.TimeTicks{Format: "2006-01-02", Ticker: CustomTimeTicker{}}
 	p.Y.Tick.Marker = CustomRateTicker{}
 	p.X.Tick.Label.Rotation = math.Pi / 4
